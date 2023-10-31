@@ -5,11 +5,19 @@
 #![warn(
     clippy::mod_module_files,
     clippy::unwrap_used,
+    missing_docs,
     rust_2018_idioms,
     unused_lifetimes,
     unused_qualifications
 )]
 
-pub fn nothing() {
-    unimplemented!()
-}
+extern crate alloc;
+
+#[cfg(feature = "std")]
+extern crate std;
+
+mod id;
+mod loader;
+mod store;
+
+pub use id::CertificateId;
