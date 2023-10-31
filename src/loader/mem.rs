@@ -5,6 +5,7 @@ use alloc::boxed::Box;
 use hashbrown::HashMap;
 use x509_verify::x509_cert::Certificate;
 
+/// Memory-only certificate loader. Stores the Certificates in a `HashMap`
 #[derive(Clone, Debug, Default)]
 pub struct MemLoader(HashMap<NameBytes, Certificate>);
 

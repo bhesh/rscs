@@ -21,3 +21,5 @@ pub mod loader;
 pub mod name;
 
 mod store;
+
+pub use store::{CertificateStore, MemCertificateStore};
