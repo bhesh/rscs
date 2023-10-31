@@ -7,11 +7,11 @@ mod mem;
 
 pub use mem::MemLoader;
 
-pub trait Loader<Id>
+pub trait Loader<Id>: Default
 where
-    Id: PartialEq + Eq,
+    Id: Eq,
 {
-    fn insert(&mut self, id: Id, cert: Certificate) -> Option<Certificate>;
+    fn insert(&mut self, name: Id, cert: Certificate) -> Option<Certificate>;
 
     fn remove(&mut self, id: &Id) -> Option<Certificate>;
 

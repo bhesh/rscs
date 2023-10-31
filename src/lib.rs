@@ -18,5 +18,6 @@ extern crate std;
 
 pub mod error;
 pub mod loader;
+pub mod name;
 
-//mod store;
+mod store;

@@ -1,30 +1,12 @@
 //! In-memory loader
 
-use crate::{error::Error, loader::Loader};
-use alloc::{boxed::Box, vec::Vec};
-use core::hash::Hash;
-use der::Encode;
+use crate::{loader::Loader, name::NameBytes};
+use alloc::boxed::Box;
 use hashbrown::HashMap;
-use x509_verify::x509_cert::{name::Name, Certificate};
+use x509_verify::x509_cert::Certificate;
 
-#[derive(Clone, Debug, PartialOrd, Ord, PartialEq, Eq, Hash)]
-pub struct NameBytes(Vec<u8>);
-
-impl TryFrom<&Name> for NameBytes {
-    type Error = Error;
-
-    fn try_from(name: &Name) -> Result<Self, Self::Error> {
-        Ok(Self(name.to_der()?))
-    }
-}
-
+#[derive(Clone, Debug, Default)]
 pub struct MemLoader(HashMap<NameBytes, Certificate>);
-
-impl MemLoader {
-    pub fn new() -> Self {
-        Self(HashMap::new())
-    }
-}
 
 impl Loader<NameBytes> for MemLoader {
     fn insert(&mut self, id: NameBytes, cert: Certificate) -> Option<Certificate> {
