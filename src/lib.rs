@@ -21,3 +21,4 @@ mod loader;
 mod store;
 
 pub use id::CertificateId;
+pub use loader::CertificateLoader;
