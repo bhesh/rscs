@@ -3,10 +3,6 @@ Rust Certificate Store (RSCS)
 
 Simple, fast, and pure Rust verification of Certificate Authority trust chains.
 
-## Future
-
-- Soft key management
-
 ## License
 
 At your discretion:
