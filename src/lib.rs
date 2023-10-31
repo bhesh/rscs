@@ -16,9 +16,7 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
-mod id;
-mod loader;
-mod store;
+pub mod error;
+pub mod loader;
 
-pub use id::CertificateId;
-pub use loader::CertificateLoader;
+mod store;

@@ -1,11 +1,10 @@
 //! Certificate Store
 
-use crate::{CertificateId, CertificateLoader};
-use hashbrown::HashMap;
+use crate::loader::Loader;
+use core::marker::PhantomData;
+use x509_verify::x509_cert::Certificate;
 
-pub struct CertificateStore<T>
+pub struct CertificateStore<Id, L>(L, PhantomData<Id>)
 where
-    T: CertificateLoader,
-{
-    map: HashMap<CertificateId, T>,
-}
+    L: Loader<Id>,
+    Id: PartialEq + Eq;

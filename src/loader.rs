@@ -1,8 +1,22 @@
 //! Certificate Loader
 
-use crate::CertificateId;
 use x509_verify::x509_cert::Certificate;
 
-pub trait CertificateLoader {
-    fn load(id: CertificateId) -> Option<Certificate>;
+mod mem;
+
+pub use mem::MemLoader;
+
+pub trait Loader<Id>
+where
+    Id: PartialEq + Eq,
+{
+    fn insert(&mut self, id: Id, cert: Certificate) -> Option<Certificate>;
+
+    fn remove(&mut self, id: &Id) -> Option<Certificate>;
+
+    fn get(&self, id: &Id) -> Option<&Certificate>;
+
+    fn iter<'a, I>(&'a self) -> I
+    where
+        I: Iterator<Item = (&'a Id, &'a Certificate)>;
 }

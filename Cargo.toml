@@ -16,7 +16,7 @@ rust-version = "1.65"
 [dependencies]
 der = { version = "0.7.8", default-features = false, features = ["derive", "pem"] }
 digest = { version = "0.10.7", default-features = false }
-hashbrown = { version = "0.14.2", default-features = false }
+hashbrown = { version = "0.14.2", default-features = false, features = ["ahash"] }
 hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
 sha2 = { version = "0.10.8", default-features = false }
 x509-verify = { version = "0.4.0", features = ["md2", "md5", "sha1", "sha2", "dsa", "rsa", "ecdsa", "ed25519", "x509", "pem"] }
