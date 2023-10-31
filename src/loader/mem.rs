@@ -1,10 +1,10 @@
 //! In-memory loader
 
 use crate::{error::Error, loader::Loader};
-use alloc::vec::Vec;
+use alloc::{boxed::Box, vec::Vec};
 use core::hash::Hash;
 use der::Encode;
-use hashbrown::{hash_map::Iter, HashMap};
+use hashbrown::HashMap;
 use x509_verify::x509_cert::{name::Name, Certificate};
 
 #[derive(Clone, Debug, PartialOrd, Ord, PartialEq, Eq, Hash)]
@@ -39,10 +39,7 @@ impl Loader<NameBytes> for MemLoader {
         self.0.get(id)
     }
 
-    fn iter<'a, I>(&'a self) -> I
-    where
-        I: Iterator<Item = (&'a NameBytes, &'a Certificate)>,
-    {
-        self.0.iter()
+    fn iter(&self) -> Box<dyn Iterator<Item = (&'_ NameBytes, &'_ Certificate)> + '_> {
+        Box::from(self.0.iter())
     }
 }

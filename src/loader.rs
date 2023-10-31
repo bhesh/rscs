@@ -1,5 +1,6 @@
 //! Certificate Loader
 
+use alloc::boxed::Box;
 use x509_verify::x509_cert::Certificate;
 
 mod mem;
@@ -16,7 +17,5 @@ where
 
     fn get(&self, id: &Id) -> Option<&Certificate>;
 
-    fn iter<'a, I>(&'a self) -> I
-    where
-        I: Iterator<Item = (&'a Id, &'a Certificate)>;
+    fn iter(&self) -> Box<dyn Iterator<Item = (&'_ Id, &'_ Certificate)> + '_>;
 }
