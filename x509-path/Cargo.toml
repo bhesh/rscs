@@ -1,0 +1,18 @@
+[package]
+name = "x509-path"
+version = "0.0.0"
+description = """
+Simple, fast, and pure Rust X.509 path validation
+"""
+authors = ["Brian Hession"]
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/bhesh/rscs"
+categories = []
+keywords = []
+readme = "README.md"
+edition = "2021"
+rust-version = "1.65"
+
+[dependencies]
+
+[features]

@@ -69,7 +69,7 @@ where
     /// - Any of the certificates in the trust chain are not yet valid
     /// - Signature verification fails
     ///
-    /// This function makes no guarantees about the certificates in `chain`. The sole focus is to
+    /// This method makes no guarantees about the certificates in `chain`. The sole focus is to
     /// verify `cert` all the way up its own trust chain. The `chain` is only used when an issuer
     /// in `cert`'s trust chain is not already present in the certificate store.
     ///

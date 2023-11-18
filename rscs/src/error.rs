@@ -14,10 +14,21 @@ pub enum Error {
 
     /// DER error
     Der(der::Error),
+
+    /// IO error
+    #[cfg(feature = "std")]
+    Io(std::io::Error),
 }
 
 impl From<der::Error> for Error {
     fn from(e: der::Error) -> Self {
         Self::Der(e)
+    }
+}
+
+#[cfg(feature = "std")]
+impl From<std::io::Error> for Error {
+    fn from(e: std::io::Error) -> Self {
+        Self::Io(e)
     }
 }

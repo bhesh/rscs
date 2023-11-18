@@ -1,6 +1,10 @@
 Rust Certificate Store (RSCS)
 =============================
 
+Store of Trust Anchors
+
+## Developement
+
 This crate is in very early development.
 
 ## License
