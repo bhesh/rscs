@@ -15,3 +15,7 @@ extern crate alloc;
 
 #[cfg(feature = "std")]
 extern crate std;
+
+mod anchor;
+
+pub use anchor::TrustAnchor;
