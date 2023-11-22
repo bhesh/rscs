@@ -46,7 +46,7 @@ macro_rules! policy_set {
     ($($p:expr),+ $(,)?) => {{
         let mut policy_set = $crate::PolicySet::default();
         $(policy_set.insert($p);)*
-            policy_set
+        policy_set
     }};
 }
 
