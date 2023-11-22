@@ -14,8 +14,11 @@ edition = "2021"
 rust-version = "1.65"
 
 [dependencies]
-const-oid = { version = "0.9.5", default-features = false }
+const-oid = { version = "0.9.5", default-features = false, features = ["db"] }
 der = { version = "0.7.8", default-features = false, features = ["derive"] }
+digest = { version = "0.10.7", default-features = false, features = ["alloc"] }
+hashbrown = { version = "0.14.2", default-features = false, features = ["ahash"] }
+sha1 = { version = "0.10.6", default-features = false }
 spki = { version = "0.7.2", default-features = false, features = ["alloc"] }
 x509-cert = { version = "0.2.4", default-features = false }
 x509-verify = { version = "0.4.4", default-features = false, features = ["sha1", "sha2", "dsa", "rsa", "ecdsa", "ed25519", "x509",] }
@@ -23,4 +26,4 @@ x509-verify = { version = "0.4.4", default-features = false, features = ["sha1",
 [features]
 legacy_digests = ["x509-verify/md2", "x509-verify/md5"]
 strict = ["x509-verify/strict"]
-std = []
+std = ["der/std", "digest/std", "x509-cert/std"]

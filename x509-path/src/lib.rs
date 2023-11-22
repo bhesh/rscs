@@ -17,5 +17,11 @@ extern crate alloc;
 extern crate std;
 
 mod anchor;
+mod error;
+mod key_id;
+mod policy;
 
 pub use anchor::TrustAnchor;
+pub use error::Error;
+pub use key_id::KeyId;
+pub use policy::{PolicyFlags, PolicySet};
