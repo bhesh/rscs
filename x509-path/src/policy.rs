@@ -1,4 +1,4 @@
-//! Certificate Policy Requirements
+//! Certificate policy requirements
 
 use der::asn1::ObjectIdentifier;
 use hashbrown::{hash_set::Iter, HashSet};
@@ -83,7 +83,7 @@ impl PolicySet {
         self.0.is_empty()
     }
 
-    /// Returns an iterator over policy OIDs.
+    /// Returns an iterator over the policy OIDs.
     pub fn iter(&self) -> Iter<'_, ObjectIdentifier> {
         self.0.iter()
     }

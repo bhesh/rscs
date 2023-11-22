@@ -1,6 +1,6 @@
 //! Trust Anchor
 
-use crate::{Error, KeyId};
+use crate::{Error, KeyId, PolicyFlags, PolicySet};
 use const_oid::db::{
     rfc5280::{ID_CE_BASIC_CONSTRAINTS, ID_CE_NAME_CONSTRAINTS},
     rfc5912::ID_CE_CERTIFICATE_POLICIES,
@@ -37,12 +37,13 @@ pub struct TrustAnchor<'a> {
     name: Name,
     pub_key: SubjectPublicKeyInfoRef<'a>,
     key_id: KeyId,
-    policy_set: Option<CertificatePolicies>,
-    policy_flags: Option<CertPolicyFlags>,
+    policy_set: Option<PolicySet>,
+    policy_flags: Option<PolicyFlags>,
     name_constraints: Option<NameConstraints>,
     path_len_constraint: Option<u32>,
 }
 
+/*
 impl<'a> TryFrom<&'a Certificate> for TrustAnchor<'a> {
     type Error = Error;
 
@@ -68,3 +69,4 @@ impl<'a> TryFrom<&'a Certificate> for TrustAnchor<'a> {
         })
     }
 }
+*/
