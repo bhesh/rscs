@@ -1,7 +1,9 @@
 //! Certificate policy requirements
 
+use crate::CertificateError;
 use der::asn1::ObjectIdentifier;
 use hashbrown::{hash_set::Iter, HashSet};
+use x509_cert::ext::pkix::CertificatePolicies;
 
 /// Policy flags to define the behavior of the policy tree during path validation.
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
@@ -46,7 +48,7 @@ macro_rules! policy_set {
     ($($p:expr),+ $(,)?) => {{
         let mut policy_set = $crate::PolicySet::default();
         $(policy_set.insert($p);)*
-        policy_set
+            policy_set
     }};
 }
 
@@ -92,6 +94,21 @@ impl PolicySet {
 impl AsRef<HashSet<ObjectIdentifier>> for PolicySet {
     fn as_ref(&self) -> &HashSet<ObjectIdentifier> {
         &self.0
+    }
+}
+
+impl TryFrom<CertificatePolicies> for PolicySet {
+    type Error = CertificateError;
+
+    fn try_from(other: CertificatePolicies) -> Result<Self, Self::Error> {
+        let mut policies = PolicySet::new();
+        for policy in other.0 {
+            if !policies.insert(policy.policy_identifier) {
+                // Only if there is a duplicate policy
+                return Err(CertificateError::InvalidPolicies);
+            }
+        }
+        Ok(policies)
     }
 }
 

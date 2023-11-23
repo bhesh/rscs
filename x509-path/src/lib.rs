@@ -23,7 +23,7 @@ mod name;
 mod policy;
 
 pub use anchor::TrustAnchor;
-pub use error::Error;
+pub use error::{CertificateError, Error};
 pub use key_id::KeyId;
 pub use name::{NameConstraints, Names};
 pub use policy::{PolicyFlags, PolicySet};

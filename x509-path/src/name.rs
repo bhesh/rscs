@@ -1,7 +1,8 @@
 //! Certificate name requirements
 
+use crate::CertificateError;
 use alloc::{slice::Iter, vec::Vec};
-use x509_cert::ext::pkix::name::GeneralName;
+use x509_cert::ext::pkix::{name::GeneralName, NameConstraints as X509NameConstraints};
 
 /// Acts like a `set` and only allows unique [`GeneralName`] values. However, it is implemented as
 /// a `list` and performs all actions with `O(n)`.
@@ -108,6 +109,43 @@ impl NameConstraints {
             permitted_subtrees,
             excluded_subtrees,
         }
+    }
+}
+
+impl TryFrom<X509NameConstraints> for NameConstraints {
+    type Error = CertificateError;
+
+    fn try_from(other: X509NameConstraints) -> Result<Self, Self::Error> {
+        // Permitted names
+        let mut permitted_subtrees = Names::new();
+        if let Some(permitted) = other.permitted_subtrees {
+            for name in permitted {
+                if name.minimum != 0 || name.maximum.is_some() {
+                    return Err(CertificateError::InvalidNameConstraints);
+                }
+                permitted_subtrees.insert(name.base.clone());
+            }
+        }
+
+        // Excluded names
+        let mut excluded_subtrees = Names::new();
+        if let Some(excluded) = other.excluded_subtrees {
+            for name in excluded {
+                if name.minimum != 0 || name.maximum.is_some() {
+                    return Err(CertificateError::InvalidNameConstraints);
+                }
+                excluded_subtrees.insert(name.base.clone());
+            }
+        }
+
+        if permitted_subtrees.is_empty() && excluded_subtrees.is_empty() {
+            // If both subtrees are empty
+            return Err(CertificateError::InvalidNameConstraints);
+        }
+        Ok(Self {
+            permitted_subtrees,
+            excluded_subtrees,
+        })
     }
 }
 
