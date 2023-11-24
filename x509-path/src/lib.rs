@@ -18,12 +18,12 @@ extern crate std;
 
 mod anchor;
 mod error;
-mod key_id;
+mod key_identifier;
 mod name;
 mod policy;
 
 pub use anchor::TrustAnchor;
 pub use error::{CertificateError, Error};
-pub use key_id::{KeyIdentifier, SubjectKeyIdentifierRef};
+pub use key_identifier::{KeyIdentifier, SubjectKeyIdentifierRef};
 pub use name::{NameConstraints, Names};
 pub use policy::{PolicyFlags, PolicySet};
