@@ -3,6 +3,7 @@
 use crate::{
     Error, KeyIdentifier, NameConstraints, PolicyFlags, PolicySet, SubjectKeyIdentifierRef,
 };
+use alloc::vec::Vec;
 use const_oid::db::{
     rfc5280::{ID_CE_BASIC_CONSTRAINTS, ID_CE_NAME_CONSTRAINTS, ID_CE_SUBJECT_KEY_IDENTIFIER},
     rfc5912::ID_CE_CERTIFICATE_POLICIES,
@@ -12,7 +13,7 @@ use spki::SubjectPublicKeyInfoRef;
 use x509_cert::{
     ext::{
         pkix::{BasicConstraints, CertificatePolicies, NameConstraints as X509NameConstraints},
-        Extensions,
+        Extension,
     },
     name::Name,
     Certificate,
@@ -35,7 +36,7 @@ pub struct TrustAnchor<'a> {
     policy_flags: Option<PolicyFlags>,
     name_constraints: Option<NameConstraints>,
     path_len_constraint: Option<u32>,
-    extensions: Option<Extensions>,
+    extensions: Option<Vec<&'a Extension>>,
 }
 
 impl<'a> TryFrom<&'a Certificate> for TrustAnchor<'a> {
@@ -51,29 +52,29 @@ impl<'a> TryFrom<&'a Certificate> for TrustAnchor<'a> {
         let mut extensions = alloc::vec![];
         if let Some(extns) = &root.tbs_certificate.extensions {
             for extn in extns {
-                match &extn.extn_id {
-                    &ID_CE_SUBJECT_KEY_IDENTIFIER => {
+                match extn.extn_id {
+                    ID_CE_SUBJECT_KEY_IDENTIFIER => {
                         key_id = Some(KeyIdentifier::from(SubjectKeyIdentifierRef::from_der(
                             extn.extn_value.as_bytes(),
                         )?));
                     }
-                    &ID_CE_CERTIFICATE_POLICIES => {
+                    ID_CE_CERTIFICATE_POLICIES => {
                         policy_set = Some(PolicySet::try_from(CertificatePolicies::from_der(
                             extn.extn_value.as_bytes(),
                         )?)?);
                     }
-                    &ID_CE_NAME_CONSTRAINTS => {
+                    ID_CE_NAME_CONSTRAINTS => {
                         name_constraints = Some(NameConstraints::try_from(
                             X509NameConstraints::from_der(extn.extn_value.as_bytes())?,
                         )?);
                     }
-                    &ID_CE_BASIC_CONSTRAINTS => {
+                    ID_CE_BASIC_CONSTRAINTS => {
                         let basic_constraints =
                             BasicConstraints::from_der(extn.extn_value.as_bytes())?;
                         path_len_constraint =
                             basic_constraints.path_len_constraint.map(|t| t.into());
                     }
-                    _ => extensions.push(extn.clone()),
+                    _ => extensions.push(extn),
                 }
             }
         }
@@ -85,7 +86,7 @@ impl<'a> TryFrom<&'a Certificate> for TrustAnchor<'a> {
         Ok(Self {
             name,
             pub_key,
-            key_id: key_id.unwrap(),
+            key_id: key_id.expect("key identifier should not be none"),
             policy_set,
             policy_flags: None,
             name_constraints,

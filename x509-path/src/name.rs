@@ -53,7 +53,7 @@ impl Names {
     /// Removes a [`GeneralName`] from the tree. Returns `false` if the [`GeneralName`] never
     /// existed in the tree.
     pub fn remove(&mut self, name: &GeneralName) -> bool {
-        match self.index_of(&name) {
+        match self.index_of(name) {
             Some(ind) => {
                 self.0.remove(ind);
                 true
