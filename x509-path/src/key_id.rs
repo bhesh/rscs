@@ -1,68 +1,47 @@
-//! SubjectKeyIdentifier representation
+//! Subject key identifier representation
 
-use crate::Error;
-use alloc::vec::Vec;
-use const_oid::db::rfc5912::ID_CE_SUBJECT_KEY_IDENTIFIER;
-use der::{asn1::OctetString, Decode};
+use der::{asn1::OctetStringRef, referenced::OwnedToRef};
 use digest::Digest;
 use sha1::Sha1;
 use spki::{SubjectPublicKeyInfoOwned, SubjectPublicKeyInfoRef};
-use x509_cert::{ext::pkix::SubjectKeyIdentifier, Certificate};
+use x509_cert::impl_newtype;
 
-/// SubjectKeyIdentifier representation
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct KeyId(Vec<u8>);
+/// SHA-1 digest output size
+const OUTPUT_SIZE: usize = 20;
 
-impl From<Vec<u8>> for KeyId {
-    fn from(other: Vec<u8>) -> Self {
-        Self(other)
+/// Referenced subject key identifier
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub struct SubjectKeyIdentifierRef<'a>(pub OctetStringRef<'a>);
+
+impl_newtype!(SubjectKeyIdentifierRef<'a>, OctetStringRef<'a>);
+
+/// Subject key identifier representation
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum KeyIdentifier<'a> {
+    /// Referenced from subject key identifier extension
+    Referenced(&'a [u8]),
+
+    /// SHA-1 digest of the subject public key
+    Owned([u8; OUTPUT_SIZE]),
+}
+
+impl<'a> From<SubjectKeyIdentifierRef<'a>> for KeyIdentifier<'a> {
+    fn from(other: SubjectKeyIdentifierRef<'a>) -> Self {
+        Self::Referenced(other.0.as_bytes())
     }
 }
 
-impl From<OctetString> for KeyId {
-    fn from(other: OctetString) -> Self {
-        Self::from(other.into_bytes())
-    }
-}
-
-impl From<SubjectKeyIdentifier> for KeyId {
-    fn from(other: SubjectKeyIdentifier) -> Self {
-        Self::from(other.0)
-    }
-}
-
-impl From<SubjectPublicKeyInfoRef<'_>> for KeyId {
+impl From<SubjectPublicKeyInfoRef<'_>> for KeyIdentifier<'static> {
     fn from(other: SubjectPublicKeyInfoRef<'_>) -> Self {
-        Self::from(Sha1::digest(other.subject_public_key.raw_bytes()).to_vec())
+        let mut output = [0u8; OUTPUT_SIZE];
+        Sha1::new_with_prefix(other.subject_public_key.raw_bytes())
+            .finalize_into((&mut output).into());
+        Self::Owned(output)
     }
 }
 
-impl From<&SubjectPublicKeyInfoOwned> for KeyId {
+impl From<&SubjectPublicKeyInfoOwned> for KeyIdentifier<'static> {
     fn from(other: &SubjectPublicKeyInfoOwned) -> Self {
-        Self::from(Sha1::digest(other.subject_public_key.raw_bytes()).to_vec())
-    }
-}
-
-impl From<SubjectPublicKeyInfoOwned> for KeyId {
-    fn from(other: SubjectPublicKeyInfoOwned) -> Self {
-        Self::from(&other)
-    }
-}
-
-impl TryFrom<&Certificate> for KeyId {
-    type Error = Error;
-
-    fn try_from(cert: &Certificate) -> Result<KeyId, Self::Error> {
-        if let Some(extns) = &cert.tbs_certificate.extensions {
-            let mut filter = extns
-                .iter()
-                .filter(|e| e.extn_id == ID_CE_SUBJECT_KEY_IDENTIFIER);
-            if let Some(e) = filter.next() {
-                return Ok(Self::from(SubjectKeyIdentifier::from_der(
-                    e.extn_value.as_bytes(),
-                )?));
-            }
-        }
-        Ok(Self::from(&cert.tbs_certificate.subject_public_key_info))
+        Self::from(other.owned_to_ref())
     }
 }
