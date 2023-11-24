@@ -78,15 +78,14 @@ impl<'a> TryFrom<&'a Certificate> for TrustAnchor<'a> {
                 }
             }
         }
-        if key_id.is_none() {
-            key_id = Some(KeyIdentifier::from(
-                &root.tbs_certificate.subject_public_key_info,
-            ));
-        }
+        let key_id = match key_id {
+            Some(id) => id,
+            None => KeyIdentifier::from(&root.tbs_certificate.subject_public_key_info),
+        };
         Ok(Self {
             name,
             pub_key,
-            key_id: key_id.expect("key identifier should not be none"),
+            key_id,
             policy_set,
             policy_flags: None,
             name_constraints,
