@@ -1,7 +1,8 @@
 //! Trust Anchor
 
 use crate::{
-    Error, KeyIdentifier, NameConstraints, PolicyFlags, PolicySet, SubjectKeyIdentifierRef,
+    name::NameConstraintsRef, Error, KeyIdentifier, NameConstraints, PolicyFlags, PolicySet,
+    SubjectKeyIdentifierRef,
 };
 use alloc::vec::Vec;
 use const_oid::db::{
@@ -12,7 +13,7 @@ use der::{referenced::OwnedToRef, Decode};
 use spki::SubjectPublicKeyInfoRef;
 use x509_cert::{
     ext::{
-        pkix::{BasicConstraints, CertificatePolicies, NameConstraints as X509NameConstraints},
+        pkix::{BasicConstraints, CertificatePolicies},
         Extension,
     },
     name::Name,
@@ -20,13 +21,6 @@ use x509_cert::{
 };
 
 /// Trust anchor representation
-///
-/// References the name, public key, and key identifer (if possible).
-///
-/// The policies, constraints, and extensions are currently owned. All of these fields need to be
-/// decoded to an owned structure as the [`x509-cert`] crate does not have referenced
-/// implementations of these complex structures. The policy OIDs are relatively cheap, while the
-/// [`GeneralName`]s in [`NameConstraints`] may have some performance impact.
 #[derive(Debug)]
 pub struct TrustAnchor<'a> {
     name: &'a Name,
@@ -34,7 +28,7 @@ pub struct TrustAnchor<'a> {
     key_id: KeyIdentifier<'a>,
     policy_set: Option<PolicySet>,
     policy_flags: Option<PolicyFlags>,
-    name_constraints: Option<NameConstraints>,
+    name_constraints: Option<NameConstraints<'a, 'a>>,
     path_len_constraint: Option<u32>,
     extensions: Option<Vec<&'a Extension>>,
 }
@@ -65,7 +59,7 @@ impl<'a> TryFrom<&'a Certificate> for TrustAnchor<'a> {
                     }
                     ID_CE_NAME_CONSTRAINTS => {
                         name_constraints = Some(NameConstraints::try_from(
-                            X509NameConstraints::from_der(extn.extn_value.as_bytes())?,
+                            NameConstraintsRef::from_der(extn.extn_value.as_bytes())?,
                         )?);
                     }
                     ID_CE_BASIC_CONSTRAINTS => {

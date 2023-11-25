@@ -19,8 +19,9 @@ extern crate std;
 mod anchor;
 mod error;
 mod key_identifier;
-mod name;
 mod policy;
+
+pub mod name;
 
 pub use anchor::TrustAnchor;
 pub use error::{CertificateError, Error};
