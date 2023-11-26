@@ -17,6 +17,7 @@ extern crate alloc;
 extern crate std;
 
 mod anchor;
+mod cert;
 mod error;
 mod key_identifier;
 mod policy;
@@ -24,6 +25,7 @@ mod policy;
 pub mod name;
 
 pub use anchor::TrustAnchor;
+pub use cert::CertTarget;
 pub use error::{CertificateError, Error};
 pub use key_identifier::{KeyIdentifier, SubjectKeyIdentifierRef};
 pub use name::{NameConstraints, Names};

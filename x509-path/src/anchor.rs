@@ -1,8 +1,8 @@
 //! Trust Anchor
 
 use crate::{
-    name::NameConstraintsRef, Error, KeyIdentifier, NameConstraints, PolicyFlags, PolicySet,
-    SubjectKeyIdentifierRef,
+    name::NameConstraintsRef, CertificateError, KeyIdentifier, NameConstraints, PolicyFlags,
+    PolicySet, SubjectKeyIdentifierRef,
 };
 use alloc::vec::Vec;
 use const_oid::db::{
@@ -21,7 +21,7 @@ use x509_cert::{
 };
 
 /// Trust anchor representation
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct TrustAnchor<'a> {
     name: &'a Name,
     pub_key: SubjectPublicKeyInfoRef<'a>,
@@ -34,7 +34,7 @@ pub struct TrustAnchor<'a> {
 }
 
 impl<'a> TryFrom<&'a Certificate> for TrustAnchor<'a> {
-    type Error = Error;
+    type Error = CertificateError;
 
     fn try_from(root: &'a Certificate) -> Result<Self, Self::Error> {
         let name = &root.tbs_certificate.subject;
